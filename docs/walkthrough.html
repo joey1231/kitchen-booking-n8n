@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kitchen Booking Workflow — Process Walkthrough</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  html, body { font-family: "Segoe UI", Helvetica, Arial, sans-serif; color: #1a1a1a; font-size: 11pt; line-height: 1.5; }
+  h1 { font-size: 22pt; margin: 0 0 4pt 0; color: #0b3d2e; }
+  h2 { font-size: 14pt; margin: 20pt 0 6pt; color: #0b3d2e; border-bottom: 1px solid #d5d5d5; padding-bottom: 3pt; page-break-after: avoid; }
+  h3 { font-size: 12pt; margin: 12pt 0 4pt; color: #274754; }
+  .cover { text-align: center; padding: 30pt 0 18pt; border-bottom: 2px solid #0b3d2e; margin-bottom: 18pt; }
+  .cover .sub { color: #555; font-size: 12pt; margin-top: 6pt; }
+  .meta { font-size: 9pt; color: #666; margin-top: 8pt; }
+  .callout { background: #f4f8f5; border-left: 4px solid #2f855a; padding: 8pt 12pt; margin: 10pt 0; border-radius: 3px; }
+  .warn { background: #fff6e8; border-left: 4px solid #c0840b; padding: 8pt 12pt; margin: 10pt 0; border-radius: 3px; }
+  .screenshot { margin: 10pt 0; padding: 6pt; border: 1px dashed #b5b5b5; background: #fafafa; font-style: italic; color: #555; font-size: 9.5pt; }
+  .screenshot img { display: block; max-width: 100%; margin: 4pt 0; border: 1px solid #ccc; border-radius: 3px; }
+  table { border-collapse: collapse; width: 100%; margin: 8pt 0; font-size: 10pt; }
+  th, td { border: 1px solid #ccc; padding: 5pt 8pt; text-align: left; }
+  th { background: #eef3ef; }
+  blockquote { border-left: 3px solid #ccc; margin: 8pt 0; padding: 4pt 12pt; color: #333; background: #fafafa; }
+  code { background: #eef; padding: 1pt 4pt; border-radius: 3px; font-family: Consolas, monospace; font-size: 9.5pt; }
+  ul, ol { margin: 4pt 0 8pt 20pt; }
+  .scene { page-break-inside: avoid; }
+  .pagebreak { page-break-before: always; }
+  .recap li { margin-bottom: 3pt; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Kitchen Booking Workflow</h1>
+  <div class="sub">Process Walkthrough — n8n Automation</div>
+  <div class="meta">Milestone 1 Deliverable · Version 1.0 · 2026-04-14</div>
+</div>
+
+<p>This guide walks a non-technical reader through exactly what happens when someone books the kitchen. It can be narrated over screenshots for a training video or reviewed as a PDF handout.</p>
+
+<div class="callout"><strong>Audience:</strong> Operations staff, HR, and anyone onboarding to the kitchen booking process. No coding knowledge required.</div>
+
+<div class="scene">
+<h2>Scene 1 — A Guest Chef Submits a Booking</h2>
+<p>Chef Amara is visiting next Tuesday to cook a tasting menu. She fills in the booking form on the intranet.</p>
+<p><strong>Form data submitted:</strong></p>
+<ul>
+  <li>Name: <em>Amara Okafor</em></li>
+  <li>Visitor type: <strong>Guest Chef</strong></li>
+  <li>Start time: <em>Tue 21 Apr 2026, 18:00</em></li>
+  <li>End time: <em>Tue 21 Apr 2026, 21:00</em></li>
+  <li>Purpose: <em>Spring tasting menu</em></li>
+</ul>
+<p>When she clicks <strong>Submit</strong>, the form sends the details to our n8n workflow over the internet.</p>
+<div class="screenshot">[Screenshot: Intranet booking form with Guest Chef option selected]</div>
+</div>
+
+<div class="scene">
+<h2>Scene 2 — The Workflow Wakes Up</h2>
+<p>The workflow is always listening on a web address (the Webhook). The moment Amara's form arrives, the first node lights up green.</p>
+<div class="screenshot">
+  <div>Full canvas — Webhook receiving the booking and dispatching through the graph.</div>
+  <img src="../screenshots/milestone-1/workflow-test-until-fallback-alert-hr.png" alt="n8n canvas full view">
+</div>
+<p>The workflow now has Amara's request in memory and is ready to decide what to do with it.</p>
+</div>
+
+<div class="scene">
+<h2>Scene 3 — The Conditional Logic Fires</h2>
+<p>A decision node called <strong>Check Visitor Type</strong> inspects the <code>visitorType</code> field.</p>
+<ul>
+  <li>If it says <code>Guest Chef</code>, the request follows the <strong>top path</strong>.</li>
+  <li>If it says <code>Regular</code>, it follows the <strong>bottom path</strong>.</li>
+</ul>
+<p>Because Amara is a Guest Chef, the workflow takes the top path.</p>
+<div class="callout"><strong>Why this matters:</strong> Guest Chefs need extra equipment and prep space. Regulars do not. Sending them down different paths keeps the calendars tidy.</div>
+</div>
+
+<div class="scene">
+<h2>Scene 4 — Calculating the Buffer Times</h2>
+<p>Because Amara is a Guest Chef, the <strong>Normalize &amp; Calculate Buffers</strong> node adjusts her times:</p>
+<ul>
+  <li><strong>Prep buffer:</strong> 60 minutes are <em>subtracted</em> from her start time. The calendar booking begins at <strong>17:00</strong> (not 18:00) so she can set up.</li>
+  <li><strong>Cleanup buffer:</strong> 30 minutes are <em>added</em> to her end time. The booking ends at <strong>21:30</strong> so staff can clean.</li>
+</ul>
+<table>
+  <thead><tr><th>Field</th><th>Submitted</th><th>After Buffer</th></tr></thead>
+  <tbody>
+    <tr><td>Start time</td><td>18:00</td><td><strong>17:00</strong></td></tr>
+    <tr><td>End time</td><td>21:00</td><td><strong>21:30</strong></td></tr>
+  </tbody>
+</table>
+<div class="callout"><strong>Note:</strong> Regulars skip this logic. Their submitted times are used as-is.</div>
+</div>
+
+<div class="pagebreak"></div>
+
+<div class="scene">
+<h2>Scene 5 — Booking Two Calendars</h2>
+<p>A Guest Chef needs <strong>both</strong> the Main Kitchen and the Prep Station. The workflow runs two calendar nodes in sequence on the Guest Chef branch:</p>
+<ol>
+  <li><strong>Main Kitchen calendar</strong> — creates an event titled <em>"Guest Chef: Amara Okafor — Spring tasting menu"</em> from 17:00 to 21:30.</li>
+  <li><strong>Prep Station calendar</strong> — creates the same event on the prep-station calendar.</li>
+</ol>
+<div class="screenshot">
+  <div>Slack + Discord notification stage (canvas view).</div>
+  <img src="../screenshots/milestone-1/sending-notification-to-slack.png" alt="Slack notification stage">
+</div>
+<div class="callout"><strong>For Regulars:</strong> Only the Main Kitchen calendar is booked. The Prep Station step is skipped.</div>
+</div>
+
+<div class="scene">
+<h2>Scene 6 — Announcing to Slack and Discord</h2>
+<p>After the calendar events are created, the <strong>Format Confirmation Message</strong> node builds a human-readable summary. Two messages are then sent in parallel to the <strong>#kitchen-updates</strong> channel:</p>
+<ul>
+  <li><strong>Slack:</strong> a formatted card with Amara's name, times, and purpose.</li>
+  <li><strong>Discord:</strong> the same information, posted via webhook.</li>
+</ul>
+<blockquote>
+New Guest Chef booking confirmed<br>
+Chef: Amara Okafor<br>
+When: Tue 21 Apr 2026, 17:00 – 21:30 (includes 60 min prep + 30 min cleanup)<br>
+Purpose: Spring tasting menu<br>
+Calendars: Main Kitchen, Prep Station
+</blockquote>
+<p>The team now knows the kitchen is claimed.</p>
+</div>
+
+<div class="scene">
+<h2>Scene 7 — Regular Visitor, the Shorter Path</h2>
+<p>For comparison, here is what happens for a Regular visitor (e.g., staff booking the kitchen for a Friday lunch-and-learn):</p>
+<ol>
+  <li>Webhook receives the form.</li>
+  <li><strong>Check Visitor Type</strong> returns <code>false</code> → follow the bottom path.</li>
+  <li><strong>No buffer</strong> is applied; submitted times are kept exactly.</li>
+  <li><strong>Only the Main Kitchen calendar</strong> is booked.</li>
+  <li>Slack and Discord receive a shorter confirmation message.</li>
+</ol>
+</div>
+
+<div class="scene">
+<h2>Scene 8 — The Error Path: When Something Breaks</h2>
+<p>Imagine the Google Calendar API is down, or a credential expired overnight.</p>
+<ol>
+  <li>The <strong>Main Kitchen</strong> calendar node tries to create the event.</li>
+  <li>The API returns an error (<code>401 Unauthorized</code> or <code>503 Service Unavailable</code>).</li>
+  <li>Instead of stopping silently, the node's <strong>error output</strong> routes to the <strong>Fallback: Alert HR Manager</strong> email node.</li>
+  <li>The Email node immediately sends an <strong>urgent message to the HR Manager</strong>.</li>
+</ol>
+<blockquote>
+<strong>Subject:</strong> URGENT: Kitchen Booking Failure<br><br>
+A kitchen booking failed to complete.<br>
+• Visitor: Amara Okafor (Guest Chef)<br>
+• Requested: Tue 21 Apr 2026, 18:00 – 21:00<br>
+• Failing step: Book Main Kitchen (Guest Chef)<br>
+• Error: 401 Unauthorized — credential expired<br><br>
+Please follow up with the visitor and investigate the integration.
+</blockquote>
+<div class="warn"><strong>Important:</strong> This email is sent <em>in addition to</em> any logging. HR is the human fallback so that no booking silently disappears. Verified in test: SMTP returned <code>250 2.0.0 OK</code>, accepted by the HR recipient.</div>
+</div>
+
+<div class="scene">
+<h2>Recap — What You Just Saw</h2>
+<ol class="recap">
+  <li>A form submission arrives.</li>
+  <li>The workflow decides: Guest Chef or Regular?</li>
+  <li>Guest Chefs get extra buffer time automatically.</li>
+  <li>The right calendars are booked (one or two).</li>
+  <li>Slack and Discord are notified.</li>
+  <li>If anything breaks, HR gets an urgent email.</li>
+</ol>
+<p>Total time from form submission to team notification: <strong>under 5 seconds</strong>.</p>
+</div>
+
+<div class="scene">
+<h2>Where to Go Next</h2>
+<ul>
+  <li>To understand <em>why</em> each decision exists, read <code>LOGIC_FLOW.md</code>.</li>
+  <li>To set up or test the workflow yourself, read <code>README.md</code>.</li>
+  <li>To see test data used for validation, open <code>sample-data/test-bookings.csv</code>.</li>
+</ul>
+</div>
+
+</body>
+</html>

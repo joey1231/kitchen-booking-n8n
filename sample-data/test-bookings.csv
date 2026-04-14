@@ -1,0 +1,12 @@
+visitorName,visitorType,requestedStart,requestedEnd,email,notes
+Sarah Kowalski,Regular,2026-04-15T10:00:00+02:00,2026-04-15T11:30:00+02:00,sarah.kowalski@example.com,Weekly meal prep session
+Marco Benedetti,Guest Chef,2026-04-16T14:00:00+02:00,2026-04-16T16:00:00+02:00,marco.benedetti@chefhub.com,Italian pasta masterclass
+Yuki Tanaka,Guest Chef,2026-04-17T09:00:00+02:00,2026-04-17T11:00:00+02:00,yuki.tanaka@chefhub.com,EDGE: buffer pushes before 08:00 business hours
+Priya Ramanathan,Guest Chef,2026-04-20T12:00:00+02:00,2026-04-20T13:30:00+02:00,priya.r@chefhub.com,Back-to-back test part 1 (Guest Chef)
+David Okafor,Regular,2026-04-20T13:30:00+02:00,2026-04-20T14:30:00+02:00,david.okafor@example.com,Back-to-back test part 2 (Regular) - should conflict with Priya cleanup buffer
+Elena Vasquez,Guest Chef,2026-04-21T10:00:00+02:00,2026-04-21T16:00:00+02:00,elena.vasquez@chefhub.com,Long 6-hour tasting menu development
+Tom Fletcher,Regular,2026-04-22T12:15:00+02:00,2026-04-22T12:45:00+02:00,tom.fletcher@example.com,Quick lunch prep
+Hans Mueller,Guest Chef,2026-04-23T16:30:00+02:00,2026-04-23T18:00:00+02:00,hans.mueller@chefhub.com,EDGE: cleanup +30min extends past 18:00 close
+,Guest Chef,not-a-date,2026-04-24T15:00:00+02:00,broken-email,MALFORMED: missing visitorName, invalid start date - should trigger HR alert
+Aisha Bello,Regular,2026-04-25T11:00:00+02:00,2026-04-25T12:30:00+02:00,aisha.bello@example.com,Weekend booking (Saturday) - policy check
+Lucas Chen,Guest Chef,2026-04-27T13:00:00+02:00,2026-04-27T15:00:00+02:00,lucas.chen@chefhub.com,SIMULATE_API_FAILURE

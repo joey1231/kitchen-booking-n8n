@@ -1,0 +1,81 @@
+================================================================
+KITCHEN BOOKING WORKFLOW — SAMPLE TEST DATA
+================================================================
+Companion to: sample-data/test-bookings.csv
+Purpose:      Validates the conditional logic, prep-buffer math,
+              dual-calendar booking, and error-handling path.
+Date:         2026-04-14
+================================================================
+
+HEADER FIELDS
+-------------
+visitorName     Full name of the person booking.
+visitorType     One of: "Regular" | "Guest Chef".
+requestedStart  ISO-8601 start timestamp with timezone.
+requestedEnd   ISO-8601 end timestamp with timezone.
+email           Contact email for confirmation.
+notes           Free-text; some rows use it to flag edge cases
+                (EDGE:, MALFORMED:, SIMULATE_API_FAILURE).
+
+ASSUMPTIONS
+-----------
+- Business hours:            08:00 – 18:00, Monday–Friday.
+- Guest Chef prep buffer:    -60 minutes on start.
+- Guest Chef cleanup buffer: +30 minutes on end.
+- Conflict detection runs against BUFFERED (effective) times.
+
+================================================================
+TEST ROWS (see test-bookings.csv for machine-readable copy)
+================================================================
+
+#01 Sarah Kowalski        Regular      15 Apr 10:00–11:30
+    Baseline Regular — Main Kitchen only, no buffer.
+
+#02 Marco Benedetti       Guest Chef   16 Apr 14:00–16:00
+    Baseline Guest Chef — books both calendars.
+    Effective times: 13:00–16:30.
+
+#03 Yuki Tanaka           Guest Chef   17 Apr 09:00–11:00   [EDGE]
+    Buffer pushes effective start to 08:00 — exactly at open.
+    Validates boundary condition.
+
+#04 Priya Ramanathan      Guest Chef   20 Apr 12:00–13:30
+    Part 1 of back-to-back pair. Effective end: 14:00.
+
+#05 David Okafor          Regular      20 Apr 13:30–14:30
+    Part 2 of back-to-back pair. Overlaps Priya's cleanup (13:30–14:00).
+    Expected: booking rejected OR HR alert, depending on conflict policy.
+
+#06 Elena Vasquez         Guest Chef   21 Apr 10:00–16:00
+    Long 6-hour session. Tests extended buffered windows.
+
+#07 Tom Fletcher          Regular      22 Apr 12:15–12:45
+    Short 30-min lunch prep.
+
+#08 Hans Mueller          Guest Chef   23 Apr 16:30–18:00   [EDGE]
+    Cleanup buffer pushes effective end to 18:30 — past close.
+    Validates business-hours rejection.
+
+#09 (missing)             Guest Chef   not-a-date           [MALFORMED]
+    Empty visitorName, invalid start date, broken email.
+    Expected: Fallback HR alert email fires.
+
+#10 Aisha Bello           Regular      25 Apr 11:00–12:30
+    Saturday booking — outside business days.
+    Validates weekend rejection policy.
+
+#11 Lucas Chen            Guest Chef   27 Apr 13:00–15:00   [SIMULATE_API_FAILURE]
+    Notes field triggers simulated Calendar-API failure.
+    Expected: Fallback HR alert email fires.
+
+================================================================
+HOW TO USE THIS DATA
+================================================================
+1. Import test-bookings.csv into the tool of your choice
+   (Excel, Google Sheets, or a curl script).
+2. POST each row as JSON to the webhook:
+     https://<n8n-host>/webhook/kitchen-booking
+3. Compare actual outcome to expected-outcomes.md.
+4. Record pass/fail in sample-data/test-results.md (TASK-007).
+
+================================================================
