@@ -18,7 +18,7 @@ Cross-references every item in the project spec to the file or screenshot that p
 ### Deliverables (spec list)
 | Deliverable | File |
 |-------------|------|
-| n8n Workflow Export (JSON) | `workflow/kitchen-booking.workflow.json` |
+| n8n Workflow Export (JSON) | `workflow/kitchen-booking.workflow.json` — live production export of the "Kitchen Booking Automation" workflow; 10 nodes, importable into n8n 1.x, credentials stripped |
 | Setup Screenshots — full workflow | `screenshots/milestone-1/workflow-test-until-fallback-alert-hr.png`, `screenshots/milestone-2/workflow-testing-view.png` |
 | Setup Screenshots — conditional-logic nodes | `screenshots/milestone-2/work-testing-view-guest-chef.png` (IF branch fired), `screenshots/milestone-1/sending-notification-to-slack.png` |
 | Process Walkthrough (PDF) | `docs/walkthrough.pdf` |

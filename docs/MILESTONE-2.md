@@ -53,7 +53,7 @@ Folder: `screenshots/milestone-2/`
 | TASK-005 | Conditional-logic screenshots | ✅ Done (workflow + guest-chef canvas views) |
 | TASK-006 | Walkthrough PDF/video | ✅ Done (updated `walkthrough.pdf` with M2 screenshots) |
 | TASK-007 | Run full test suite | ✅ Partial (core cases run; remaining edge cases tracked in M3) |
-| TASK-008 | Export and publish final JSON | ✅ Done (`workflow/kitchen-booking.workflow.json`) |
+| TASK-008 | Export and publish final JSON | ✅ Done — `workflow/kitchen-booking.workflow.json` is now the live production export ("Kitchen Booking Automation"), 10 nodes, credentials stripped, imports cleanly into n8n 1.x. |
 
 ## Definition of Done (M2)
 Reviewer can (a) open any M2 screenshot and see green nodes + real integrations, (b) replay either payload via curl and observe live Slack/Discord/Calendar effects, (c) see the HR fallback demonstrably fire and deliver on simulated failures. **Met.**
