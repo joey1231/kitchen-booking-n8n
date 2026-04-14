@@ -158,6 +158,57 @@ Please follow up with the visitor and investigate the integration.
 <div class="warn"><strong>Important:</strong> This email is sent <em>in addition to</em> any logging. HR is the human fallback so that no booking silently disappears. Verified in test: SMTP returned <code>250 2.0.0 OK</code>, accepted by the HR recipient.</div>
 </div>
 
+<div class="pagebreak"></div>
+
+<div class="scene">
+<h2>Milestone 2 — Live Evidence the Workflow Works</h2>
+<p>The screenshots below were captured from the live n8n instance after credentials were wired for Google Calendar, Slack, Discord, and SMTP. Every external integration delivered successfully.</p>
+
+<h3>Full canvas — all nodes green (both branches executed)</h3>
+<div class="screenshot">
+  <div>Execution trail with 3 items aggregated at the HR fallback sink — confirms error edges are wired to every external node.</div>
+  <img src="../screenshots/milestone-2/workflow-testing-view.png" alt="M2 full workflow green">
+</div>
+
+<h3>Guest Chef branch fired</h3>
+<div class="screenshot">
+  <div>IF → buffered Set → dual Google Calendar → merge → Slack + Discord. 4 items reached the HR sink across runs.</div>
+  <img src="../screenshots/milestone-2/work-testing-view-guest-chef.png" alt="Guest Chef branch execution">
+</div>
+
+<h3>Real Google Calendar events created</h3>
+<div class="screenshot">
+  <div>Regular: "Kitchen: Jamie Chen 6–7pm" — single event, no buffer. Guest Chef: "Prep Station: Chef Marco Rinaldi 8–9pm" plus "Guest Chef: Chef Marco Rinaldi 9pm–1:30am" — dual calendar with buffered times.</div>
+  <img src="../screenshots/milestone-2/google-calendar-event.png" alt="Google Calendar events">
+</div>
+
+<h3>Slack posts in #kitchen-updates</h3>
+<div class="screenshot">
+  <div>Confirmation cards for both Regular and Guest Chef — showing Requested, Effective, and Buffer-applied fields.</div>
+  <img src="../screenshots/milestone-2/slack-testing-result.png" alt="Slack delivery">
+</div>
+
+<h3>Guest Chef Slack card (buffer visible)</h3>
+<div class="screenshot">
+  <div>"Buffer applied: YES (-60m prep / +30m cleanup)" and "Calendars: Main Kitchen + Prep Station" — proves the conditional logic path.</div>
+  <img src="../screenshots/milestone-2/guest-slack-notification.png" alt="Guest Chef Slack buffer card">
+</div>
+
+<h3>Discord posts in Kitchen Updates</h3>
+<div class="screenshot">
+  <div>Identical content posted to Discord via webhook.</div>
+  <img src="../screenshots/milestone-2/discord-test-result.png" alt="Discord delivery">
+</div>
+
+<h3>HR urgent email — real inbox</h3>
+<div class="screenshot">
+  <div>Subject line triggered by the fallback node. Body includes Workflow, Timestamp, Failed Node, and the original Payload.</div>
+  <img src="../screenshots/milestone-2/email-testing-result.png" alt="HR urgent email inbox">
+</div>
+</div>
+
+<div class="pagebreak"></div>
+
 <div class="scene">
 <h2>Recap — What You Just Saw</h2>
 <ol class="recap">
